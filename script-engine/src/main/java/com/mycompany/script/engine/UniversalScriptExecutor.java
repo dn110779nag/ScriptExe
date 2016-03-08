@@ -14,12 +14,19 @@ import javax.script.SimpleScriptContext;
 import org.slf4j.Logger;
 
 /**
- *
+ * Универсальный запускатель скриптов.
+ * 
  * @author user
  */
 public class UniversalScriptExecutor {
     private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
     
+    /**
+     * Определение расширения файла.
+     * 
+     * @param fileName имя файла
+     * @return расширение
+     */
     private String getExtension(String fileName){
         int pos = fileName.lastIndexOf('.');
         if(pos!=-1){

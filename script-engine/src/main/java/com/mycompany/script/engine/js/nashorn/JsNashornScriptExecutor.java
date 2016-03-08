@@ -6,14 +6,11 @@
 package com.mycompany.script.engine.js.nashorn;
 
 import com.mycompany.script.engine.ScriptResult;
-import groovy.util.ResourceException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
