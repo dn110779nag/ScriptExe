@@ -47,6 +47,7 @@ public class JsNashornScriptExecutor {
             Bindings engineScope = newContext.getBindings(ScriptContext.ENGINE_SCOPE);
             engineScope.putAll(binding);
             engineScope.put("logger", logger);
+            engineScope.put("currentDir", new File("").getAbsolutePath());
             result.setStart(System.currentTimeMillis());
             try(Reader reader = Files.newBufferedReader(new File(basePath, scriptPath).toPath())){
                 Object value = engine.eval(reader, engineScope);
