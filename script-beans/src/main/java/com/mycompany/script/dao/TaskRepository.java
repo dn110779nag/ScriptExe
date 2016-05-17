@@ -13,13 +13,13 @@ import java.util.List;
  * 
  * @author nova
  */
-public interface TaskDao {
+public interface TaskRepository {
     /**
      * Изменение признака выполнения задачи
      * @param t задача
      * @param isRunning признак
      */
-    void setRunning(Task t, boolean isRunning);
+    //void setRunning(Task t, boolean isRunning);
     /**
      * Получить список задач.
      * 

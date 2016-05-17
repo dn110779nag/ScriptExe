@@ -26,8 +26,8 @@ public class Task {
      */
     private String scheduler;
     /**
-     * Признак отключенности.
+     * Признак включенности.
      */
-    private boolean disabled;
+    private boolean enabled;
     
 }

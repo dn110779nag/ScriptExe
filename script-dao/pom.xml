@@ -6,19 +6,10 @@
         <artifactId>ScriptExe</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>script-beans</artifactId>
+    <artifactId>script-dao</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-<!--    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.14.8</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>-->
-    <name>script-base</name>
 </project>
