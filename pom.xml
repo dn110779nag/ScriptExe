@@ -9,6 +9,7 @@
         <module>script-engine</module>
         <module>script-beans</module>
         <module>script-repository</module>
+        <module>script-exe</module>
     </modules>
     <properties>
         <product.version>0.1</product.version>
