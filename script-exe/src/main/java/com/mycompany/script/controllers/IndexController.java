@@ -5,17 +5,22 @@
  */
 package com.mycompany.script.controllers;
 
+import groovy.lang.GroovySystem;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  *
  * @author user
  */
-@RestController
+@Controller
 public class IndexController {
     @RequestMapping({"/"})
-    public String returnIndex(){
-        return "index";
+    public ModelAndView returnIndex(){
+        ModelAndView m = new ModelAndView("index", "groovyVersion", GroovySystem.getVersion());
+        m.addObject("bootVersion", "???");
+        return m;
     }
 }
