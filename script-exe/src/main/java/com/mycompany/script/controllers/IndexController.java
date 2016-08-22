@@ -5,9 +5,10 @@
  */
 package com.mycompany.script.controllers;
 
-import groovy.lang.GroovySystem;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,9 +19,9 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class IndexController {
     @RequestMapping({"/"})
-    public ModelAndView returnIndex(){
-        ModelAndView m = new ModelAndView("index", "groovyVersion", GroovySystem.getVersion());
-        m.addObject("bootVersion", "???");
+    public ModelAndView returnIndex(@RequestParam(value="name", required = false) String name){
+        ModelAndView m = new ModelAndView("index", "name", name);
+        
         return m;
     }
 }

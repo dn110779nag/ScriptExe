@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //@EnableAutoConfiguration
 public class ScriptExeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ScriptExeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ScriptExeApplication.class, args);
+    }
 }
