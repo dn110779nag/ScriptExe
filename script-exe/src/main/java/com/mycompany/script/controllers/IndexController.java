@@ -32,8 +32,9 @@ public class IndexController {
     
     @RequestMapping({"/"})
     public ModelAndView returnIndex(@RequestParam(value="name", required = false) String name){
-        ModelAndView m = new ModelAndView("index", "name", name+buildProperties.getVersion()+"-"+buildProperties.getTime());
-        
+        ModelAndView m = new ModelAndView("index");
+        m.addObject("timestamp", buildProperties.getTime().getTime());
+        m.addObject("version", buildProperties.getVersion());
         return m;
     }
 }

@@ -2,3 +2,4 @@
 /script-repository/target/
 /script-engine/target/
 /script-exe/target/
+/script-exe/db/
