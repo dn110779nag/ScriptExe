@@ -5,6 +5,7 @@
  */
 package com.mycompany.script.engine.groovy;
 
+import com.mycompany.script.engine.ScriptExecutor;
 import com.mycompany.script.engine.ScriptResult;
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
@@ -19,7 +20,7 @@ import org.slf4j.Logger;
  * 
  * @author user
  */
-public class GroovyScriptExecutor{
+public class GroovyScriptExecutor implements ScriptExecutor{
     /**
      * Запуск скрипта.
      * 
@@ -29,6 +30,7 @@ public class GroovyScriptExecutor{
      * @param binding биндинг
      * @return результат
      */
+    @Override
     public ScriptResult execScript(
             String scriptPath, 
             String basePath,

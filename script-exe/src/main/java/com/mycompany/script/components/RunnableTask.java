@@ -1,0 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.mycompany.script.components;
+
+import com.mycompany.script.beans.Task;
+import com.mycompany.script.beans.TaskStatus;
+import com.mycompany.script.engine.ScriptExecutor;
+import com.mycompany.script.engine.ScriptResult;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.scheduling.support.CronTrigger;
+
+/**
+ * Выполняемая задача для постановки в очередь
+ * 
+ * @author user
+ */
+public class RunnableTask implements Runnable {
+
+    private final Task task;
+    private final TaskStatus taskStatus;
+    private final Logger logger;
+    private final ScriptExecutor scriptExecutor;
+    private final String basePath;
+
+    public RunnableTask(Task task, TaskStatus taskStatus, ScriptExecutor scriptExecutor, String basePath) {
+        this.task = task;
+        this.taskStatus = taskStatus;
+        this.logger = LoggerFactory.getLogger(task.getLoggerName());
+        this.scriptExecutor = scriptExecutor;
+        this.basePath = basePath;
+    }
+
+    @Override
+    public void run() {
+        try {
+            Map<String, Object> binding = new HashMap<>();
+            ScriptResult result = scriptExecutor.execScript(task.getPath(), basePath, logger, binding);
+            if (result.getException() != null) {
+                taskStatus.setLastError(""+result.getException());
+            }
+        } catch (Throwable ex) {
+            taskStatus.setLastError(""+ex);
+        } finally{
+            taskStatus.setLastFinish(new Date());
+            taskStatus.setNextStart(new CronSequenceGenerator(task.getScheduler())
+                    .next(taskStatus.getLastFinish()));
+            taskStatus.setRunning(false);
+        }
+    }
+}

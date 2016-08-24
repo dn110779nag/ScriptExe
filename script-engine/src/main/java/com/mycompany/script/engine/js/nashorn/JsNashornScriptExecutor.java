@@ -5,6 +5,7 @@
  */
 package com.mycompany.script.engine.js.nashorn;
 
+import com.mycompany.script.engine.ScriptExecutor;
 import com.mycompany.script.engine.ScriptResult;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import org.slf4j.Logger;
  *
  * @author user
  */
-public class JsNashornScriptExecutor {
+public class JsNashornScriptExecutor implements ScriptExecutor{
     /**
      * Запуск скрипта.
      * 
@@ -33,6 +34,7 @@ public class JsNashornScriptExecutor {
      * @param binding биндинг
      * @return результат
      */
+    @Override
     public ScriptResult execScript(
             String scriptPath, 
             String basePath,

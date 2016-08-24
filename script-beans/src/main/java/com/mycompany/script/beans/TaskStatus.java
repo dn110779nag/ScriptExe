@@ -12,29 +12,43 @@ import java.util.Date;
  * 
  * @author nova
  */
+@lombok.Data
 public class TaskStatus {
+
+    /**
+     * Конструктор.
+     * 
+     * @param taskId 
+     */
+    public TaskStatus(long taskId) {
+        this.taskId = taskId;
+    }
+    
+    
+    
     /**
      * Идентификатор задачи.
      */
-    public long taskId;
+    private long taskId;
     /**
      * Последняя дата старта.
      */
-    public Date lastStart;
+    private Date lastStart;
     /**
      * Последняя дата завершения.
      */
-    public Date lastFinish;
+    private Date lastFinish;
     /**
      * Следующая дата запуска.
      */
-    public Date nextStart;
+    private Date nextStart;
     /**
-     * Последний текст ошибок.
+     * Последний текст ошибки.
      */
-    public String lastError;
+    private String lastError;
     /**
      * Признак запуска.
      */
     private boolean running;
+    
 }

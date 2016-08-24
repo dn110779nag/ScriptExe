@@ -18,7 +18,7 @@ import org.slf4j.Logger;
  * 
  * @author user
  */
-public class UniversalScriptExecutor {
+public class UniversalScriptExecutor  implements ScriptExecutor{
     private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
     
     /**
@@ -44,6 +44,7 @@ public class UniversalScriptExecutor {
      * @param binding биндинг
      * @return результат
      */
+    @Override
     public ScriptResult execScript(
             String scriptPath, 
             String basePath,
