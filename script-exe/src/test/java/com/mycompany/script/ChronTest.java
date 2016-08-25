@@ -7,6 +7,7 @@ package com.mycompany.script;
 
 import java.util.Date;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
 /**
@@ -17,8 +18,12 @@ public class ChronTest {
     
     @Test
     public void testChron(){
-        System.out.println(new Date());
-        System.out.println(new CronSequenceGenerator("0 */1 * * * *").next(new Date()));
+        Date d1 = new Date();
+        Date d2 = new CronSequenceGenerator("0 */1 * * * *").next(d1);
+        assertTrue(d2.after(d1));
+        
+//        System.out.println(new Date());
+//        System.out.println(new CronSequenceGenerator("0 */1 * * * *").next(new Date()));
     }
     
 }

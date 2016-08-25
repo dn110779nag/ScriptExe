@@ -51,23 +51,20 @@ public class TaskComponent {
     public void init() {
         taskList.addAll(taskRepository.list());
         taskList.forEach(t -> {
-            tasksStatuses.put(t.getId(), new TaskStatus(t.getId()));
+            TaskStatus taskStatus = new TaskStatus(t.getId());
+            tasksStatuses.put(t.getId(), taskStatus);
+            taskStatus.setNextStart(new CronSequenceGenerator(t.getScheduler()).next(new Date()));
         });
     }
 
     @Scheduled(fixedDelay = 10000l)
     public void runTasks() {
-        logger.trace("runTasks");
+        
         for (Task t : taskList) {
             TaskStatus taskStatus = tasksStatuses.get(t.getId());
-            if(taskStatus.getNextStart()==null){
-                taskStatus.setNextStart(new CronSequenceGenerator(t.getScheduler()).next(new Date()));
-            }
-            
-            logger.trace("task={}, nextStart={}, isEnabled={}, isRunning={}, {}", 
+            logger.trace("runTasks: task={}, nextStart={}, isEnabled={}, isRunning={}, {}", 
                     t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning(), 
                     taskStatus.getNextStart().before(new Date()));
-            
             if (t.isEnabled() && !taskStatus.isRunning() && taskStatus.getNextStart().before(new Date())) {
                 logger.trace("sending task={}, nextStart={}, isEnabled={}, isRunning={}", 
                     t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning());
