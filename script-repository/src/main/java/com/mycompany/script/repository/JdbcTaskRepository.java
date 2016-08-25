@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  * @author nova
  */
+@Component
 public class JdbcTaskRepository implements TaskRepository{
     private final JdbcTemplate jdbcTemplate;
     
@@ -46,6 +48,7 @@ public class JdbcTaskRepository implements TaskRepository{
                     t.setEnabled(rs.getBoolean("task_enabled"));
                     t.setScheduler(rs.getString("task_scheduler"));
                     t.setLoggerName(rs.getString("task_logger_name"));
+                    t.setPath(rs.getString("task_path"));
                     return t;
         });
     }

@@ -17,12 +17,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.stereotype.Component;
 
 /**
  * Основной компонент, управляющий выполнением задач.
  * 
  * @author user
  */
+@Component
 public class TaskComponent {
 
     private TaskExecutor executor;
@@ -38,7 +40,7 @@ public class TaskComponent {
             TaskExecutor executor,
             TaskRepository taskRepository,
             ScriptExecutor scriptExecutor,
-            @Value("${basePath}") String basePath) {
+            @Value("${scripts.base-path}") String basePath) {
         this.executor = executor;
         this.taskRepository = taskRepository;
         this.scriptExecutor = scriptExecutor;
@@ -53,19 +55,29 @@ public class TaskComponent {
         });
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000l)
     public void runTasks() {
+        logger.trace("runTasks");
         for (Task t : taskList) {
             TaskStatus taskStatus = tasksStatuses.get(t.getId());
             if(taskStatus.getNextStart()==null){
                 taskStatus.setNextStart(new CronSequenceGenerator(t.getScheduler()).next(new Date()));
             }
-            if (t.isEnabled() && !taskStatus.isRunning()) {
-                taskStatus.setLastError(null);
-                taskStatus.setLastFinish(null);
-                taskStatus.setLastStart(new Date());
-                taskStatus.setNextStart(null);
-                taskStatus.setRunning(true);
+            
+            logger.trace("task={}, nextStart={}, isEnabled={}, isRunning={}, {}", 
+                    t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning(), 
+                    taskStatus.getNextStart().before(new Date()));
+            
+            if (t.isEnabled() && !taskStatus.isRunning() && taskStatus.getNextStart().before(new Date())) {
+                logger.trace("sending task={}, nextStart={}, isEnabled={}, isRunning={}", 
+                    t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning());
+                synchronized(taskStatus){
+                    taskStatus.setLastError(null);
+                    taskStatus.setLastFinish(null);
+                    taskStatus.setLastStart(new Date());
+                    taskStatus.setNextStart(null);
+                    taskStatus.setRunning(true);
+                }
                 executor.execute(new RunnableTask(t, taskStatus, scriptExecutor, basePath));
             }
         }

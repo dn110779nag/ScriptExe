@@ -40,19 +40,26 @@ public class RunnableTask implements Runnable {
 
     @Override
     public void run() {
+        String err = null;
         try {
+            logger.trace("starting task {}, path {}", task.getId(), task.getPath());
             Map<String, Object> binding = new HashMap<>();
             ScriptResult result = scriptExecutor.execScript(task.getPath(), basePath, logger, binding);
             if (result.getException() != null) {
                 taskStatus.setLastError(""+result.getException());
             }
         } catch (Throwable ex) {
-            taskStatus.setLastError(""+ex);
+            logger.error("", ex);
+            err = ""+ex;
+            
         } finally{
-            taskStatus.setLastFinish(new Date());
-            taskStatus.setNextStart(new CronSequenceGenerator(task.getScheduler())
-                    .next(taskStatus.getLastFinish()));
-            taskStatus.setRunning(false);
+            synchronized(taskStatus){
+                taskStatus.setLastFinish(new Date());
+                taskStatus.setNextStart(new CronSequenceGenerator(task.getScheduler())
+                        .next(taskStatus.getLastFinish()));
+                logger.trace("nextStart={}", taskStatus.getNextStart());
+                taskStatus.setRunning(false);
+            }
         }
     }
 }
