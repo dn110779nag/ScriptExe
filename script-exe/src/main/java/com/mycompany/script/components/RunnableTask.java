@@ -5,6 +5,7 @@
  */
 package com.mycompany.script.components;
 
+import com.mycompany.script.beans.ConfigManager;
 import com.mycompany.script.beans.Task;
 import com.mycompany.script.beans.TaskStatus;
 import com.mycompany.script.engine.ScriptExecutor;
@@ -29,13 +30,24 @@ public class RunnableTask implements Runnable {
     private final Logger logger;
     private final ScriptExecutor scriptExecutor;
     private final String basePath;
+    private final ConfigManager configManager;
 
-    public RunnableTask(Task task, TaskStatus taskStatus, ScriptExecutor scriptExecutor, String basePath) {
+    public RunnableTask(Task task, TaskStatus taskStatus, 
+            ScriptExecutor scriptExecutor, 
+            ConfigManager configManager,
+            String basePath) {
         this.task = task;
         this.taskStatus = taskStatus;
         this.logger = LoggerFactory.getLogger(task.getLoggerName());
         this.scriptExecutor = scriptExecutor;
         this.basePath = basePath;
+        this.configManager = configManager;
+    }
+    
+    private Map<String, Object> prepareBinding(){
+        Map<String, Object> binding = new HashMap<>();
+        binding.put("conf", configManager.getConfigTree());
+        return binding;
     }
 
     @Override
@@ -43,7 +55,8 @@ public class RunnableTask implements Runnable {
         String err = null;
         try {
             logger.trace("starting task {}, path {}", task.getId(), task.getPath());
-            Map<String, Object> binding = new HashMap<>();
+            Map<String, Object> binding = prepareBinding();
+            
             ScriptResult result = scriptExecutor.execScript(task.getPath(), basePath, logger, binding);
             if (result.getException() != null) {
                 taskStatus.setLastError(""+result.getException());

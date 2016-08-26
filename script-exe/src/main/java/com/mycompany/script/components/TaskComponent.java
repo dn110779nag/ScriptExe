@@ -1,5 +1,6 @@
 package com.mycompany.script.components;
 
+import com.mycompany.script.beans.ConfigManager;
 import com.mycompany.script.beans.Task;
 import com.mycompany.script.beans.TaskStatus;
 import com.mycompany.script.dao.TaskRepository;
@@ -29,24 +30,27 @@ import org.springframework.stereotype.Component;
 @DependsOn("dbConfig")
 public class TaskComponent {
 
-    private TaskExecutor executor;
-    private TaskRepository taskRepository;
+    private final TaskExecutor executor;
+    private final TaskRepository taskRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final List<Task> taskList = new ArrayList<>();
-    private Map<Long, TaskStatus> tasksStatuses = new HashMap<>();
-    private ScriptExecutor scriptExecutor;
+    private final Map<Long, TaskStatus> tasksStatuses = new HashMap<>();
+    private final ScriptExecutor scriptExecutor;
     private final String basePath;
+    private final ConfigManager configManager;
 
     @Autowired
     public TaskComponent(
             TaskExecutor executor,
             TaskRepository taskRepository,
             ScriptExecutor scriptExecutor,
+            ConfigManager configManager,
             @Value("${scripts.base-path}") String basePath) {
         this.executor = executor;
         this.taskRepository = taskRepository;
         this.scriptExecutor = scriptExecutor;
         this.basePath = basePath;
+        this.configManager = configManager;
     }
 
     @PostConstruct
@@ -77,7 +81,7 @@ public class TaskComponent {
                     taskStatus.setNextStart(null);
                     taskStatus.setRunning(true);
                 }
-                executor.execute(new RunnableTask(t, taskStatus, scriptExecutor, basePath));
+                executor.execute(new RunnableTask(t, taskStatus, scriptExecutor, configManager, basePath));
             }
         }
     }
