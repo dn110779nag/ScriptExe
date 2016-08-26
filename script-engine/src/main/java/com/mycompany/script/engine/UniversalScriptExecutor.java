@@ -3,6 +3,8 @@ package com.mycompany.script.engine;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Map;
 import javax.script.Bindings;
@@ -50,11 +52,16 @@ public class UniversalScriptExecutor  implements ScriptExecutor{
             String basePath,
             Logger logger,
             Map<String, Object> binding){
+        
+        
+        
         ScriptResult result = new ScriptResult();
         String extension = getExtension(scriptPath);
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         
         try{
+            ClassLoader loader = new URLClassLoader(new URL[]{new URL("file://"+new File(basePath).getAbsolutePath())});
+            Thread.currentThread().setContextClassLoader(loader);
             if(engine==null){
                 throw new IOException("Движок не найден для расширения "+extension);
             }

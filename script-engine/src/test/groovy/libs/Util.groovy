@@ -4,8 +4,8 @@ package libs
  * @author user
  */
 class Util {
-	String sayHello(){
+    String sayHello(){
             "hello"
-        }
+    }
 }
 
