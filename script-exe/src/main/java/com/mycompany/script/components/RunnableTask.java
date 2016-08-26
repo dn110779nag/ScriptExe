@@ -52,7 +52,6 @@ public class RunnableTask implements Runnable {
 
     @Override
     public void run() {
-        String err = null;
         try {
             logger.trace("starting task {}, path {}", task.getId(), task.getPath());
             Map<String, Object> binding = prepareBinding();
@@ -63,7 +62,7 @@ public class RunnableTask implements Runnable {
             }
         } catch (Throwable ex) {
             logger.error("", ex);
-            err = ""+ex;
+            taskStatus.setLastError(""+ex);
             
         } finally{
             synchronized(taskStatus){

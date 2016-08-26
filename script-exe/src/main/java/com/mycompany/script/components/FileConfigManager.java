@@ -45,6 +45,7 @@ public class FileConfigManager implements ConfigManager{
     
     private void reload() throws IOException{
         File f = new File(filePath);
+//        logger.debug("f.lastModified()={}>lastupdate={} ==> {}", f.lastModified(), lastupdate, f.lastModified()>lastupdate);
         if(f.lastModified()>lastupdate){
             Properties p = new Properties();
             try(BufferedReader br = Files.newBufferedReader(f.toPath(), Charset.forName("utf-8"))){
@@ -52,6 +53,7 @@ public class FileConfigManager implements ConfigManager{
                 plainfConfig = p;
                 configTree = convertPlainToTree(p);
                 lastupdate = f.lastModified();
+//                logger.debug("p={}", p);
             }
         }
     }
@@ -61,14 +63,14 @@ public class FileConfigManager implements ConfigManager{
         @Override
         public void run() {
             try{
-                while(!isInterrupted()){
+                do{
                     try {
                         reload();
                         sleep(2000);
                     } catch (IOException ex) {
                         logger.error("", ex);
                     }
-                }
+                } while(!isInterrupted());
             } catch(InterruptedException ex){
                 logger.info(Thread.currentThread().getName()+" stopping");
             }
@@ -78,6 +80,7 @@ public class FileConfigManager implements ConfigManager{
     
     @PostConstruct
     public void init() throws IOException{
+        reload();
         fileWatchDog.start();
     }
     @PreDestroy
