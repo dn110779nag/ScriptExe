@@ -55,7 +55,7 @@ public class RunnableTask implements Runnable {
         try {
             logger.trace("starting task {}, path {}", task.getId(), task.getPath());
             Map<String, Object> binding = prepareBinding();
-            
+            logger.trace("binding={}", binding);
             ScriptResult result = scriptExecutor.execScript(task.getPath(), basePath, logger, binding);
             if (result.getException() != null) {
                 taskStatus.setLastError(""+result.getException());

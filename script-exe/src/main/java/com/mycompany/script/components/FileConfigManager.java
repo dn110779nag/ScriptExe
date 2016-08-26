@@ -39,13 +39,15 @@ public class FileConfigManager implements ConfigManager{
     
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public FileConfigManager(@Value("config.path") String filePath) {
+    public FileConfigManager(@Value("${config.path}") String filePath) {
         this.filePath = filePath;
     }
     
     private void reload() throws IOException{
         File f = new File(filePath);
-//        logger.debug("f.lastModified()={}>lastupdate={} ==> {}", f.lastModified(), lastupdate, f.lastModified()>lastupdate);
+        
+//        logger.debug("{} f.lastModified()={}>lastupdate={} ==> {}", 
+//                f.getAbsolutePath(), f.lastModified(), lastupdate, f.lastModified()>lastupdate);
         if(f.lastModified()>lastupdate){
             Properties p = new Properties();
             try(BufferedReader br = Files.newBufferedReader(f.toPath(), Charset.forName("utf-8"))){
