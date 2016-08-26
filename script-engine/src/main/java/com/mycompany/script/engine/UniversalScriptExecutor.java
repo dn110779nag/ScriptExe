@@ -3,10 +3,16 @@ package com.mycompany.script.engine;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -14,32 +20,62 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Универсальный запускатель скриптов.
- * 
+ *
  * @author user
  */
-public class UniversalScriptExecutor  implements ScriptExecutor{
+public class UniversalScriptExecutor implements ScriptExecutor {
+
+    private static final Set<String> CLASSPATH = new HashSet<>();
+
+    /**
+     * Добавление корневой папки со скриптами в класспас, чтобы работыли либы.
+     * 
+     * @param path путь к корневой папке
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws MalformedURLException 
+     */
+    private static final void addPath(String path) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
+        String absolutePath = new File(path).getAbsolutePath();
+        System.out.println(absolutePath);
+        if(!CLASSPATH.contains(absolutePath)){
+            URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Class sysclass = URLClassLoader.class;
+            
+            Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
+            method.setAccessible(true);
+            method.invoke(sysloader, new Object[]{new URL("file://"+absolutePath+"/")});
+            CLASSPATH.add(absolutePath);
+        }
+        
+    }
+
     private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-    
+
     /**
      * Определение расширения файла.
-     * 
+     *
      * @param fileName имя файла
      * @return расширение
      */
-    private String getExtension(String fileName){
+    private String getExtension(String fileName) {
         int pos = fileName.lastIndexOf('.');
-        if(pos!=-1){
-            return fileName.substring(pos+1);
+        if (pos != -1) {
+            return fileName.substring(pos + 1);
         } else {
-            throw new IndexOutOfBoundsException("Невозможно определить расширение файла "+fileName);
+            throw new IndexOutOfBoundsException("Невозможно определить расширение файла " + fileName);
         }
     }
+
     /**
      * Запуск скрипта.
-     * 
+     *
      * @param scriptPath путь на диске к скрипту
      * @param basePath базовый путь
      * @param logger логгер
@@ -48,22 +84,19 @@ public class UniversalScriptExecutor  implements ScriptExecutor{
      */
     @Override
     public ScriptResult execScript(
-            String scriptPath, 
+            String scriptPath,
             String basePath,
             Logger logger,
-            Map<String, Object> binding){
-        
-        
-        
+            Map<String, Object> binding) {
+
         ScriptResult result = new ScriptResult();
-        String extension = getExtension(scriptPath);
-        ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
-        
-        try{
-            ClassLoader loader = new URLClassLoader(new URL[]{new URL("file://"+new File(basePath).getAbsolutePath())});
-            Thread.currentThread().setContextClassLoader(loader);
-            if(engine==null){
-                throw new IOException("Движок не найден для расширения "+extension);
+
+        try {
+            addPath(basePath);
+            String extension = getExtension(scriptPath);
+            ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
+            if (engine == null) {
+                throw new IOException("Движок не найден для расширения " + extension);
             }
             ScriptContext newContext = new SimpleScriptContext();
             newContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
@@ -71,16 +104,27 @@ public class UniversalScriptExecutor  implements ScriptExecutor{
             engineScope.putAll(binding);
             engineScope.put("logger", logger);
             result.setStart(System.currentTimeMillis());
-            try(Reader reader = Files.newBufferedReader(new File(basePath, scriptPath).toPath())){
+            try (Reader reader = Files.newBufferedReader(new File(basePath, scriptPath).toPath())) {
                 Object value = engine.eval(reader, engineScope);
                 result.setResult(value);
             }
-        } catch(IOException|ScriptException|RuntimeException ex){
+        } catch (Throwable ex) {
             logger.error("", ex);
             result.setException(ex);
-        } finally{
+        } finally {
             result.setFinish(System.currentTimeMillis());
         }
         return result;
     }
+
+//    public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
+//
+//        UniversalScriptExecutor scriptExecutor = new UniversalScriptExecutor();
+//
+//        ScriptResult res = scriptExecutor.execScript("test.groovy",
+//                "/home/data/WORK/ScriptExe/script-exe/scripts/",
+//                LoggerFactory.getLogger("test"), new HashMap<>());
+//
+//    }
+
 }
