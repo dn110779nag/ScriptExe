@@ -5,6 +5,8 @@
  */
 package com.mycompany.script.config;
 
+import com.mycompany.script.beans.Task;
+import com.mycompany.script.repository.JdbcTaskRepository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +28,8 @@ public class DbConfig {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTaskRepository jdbcTaskRepository;
     
     @Value("${create.script.4.tasks}")
     private String createScript;
@@ -43,6 +47,16 @@ public class DbConfig {
         logger.trace("tableExists={}", tableExists);
         if(!tableExists){
             jdbcTemplate.execute(createScript);
+            Task t = Task.builder()
+                    .id(0)
+                    .path("test.groovy")
+                    .enabled(true)
+                    .loggerName("test")
+                    .scheduler("0 *\\1 * * * *")
+                    .description("Тестовый скрипт")
+                    .build();
+            jdbcTaskRepository.addTask(t);
         }
+        
     }
 }

@@ -1,8 +1,12 @@
+package com.mycompany.script.controllers;
 
+import com.mycompany.script.beans.Task;
+import com.mycompany.script.components.TaskComponent;
 import com.mycompany.script.dto.AnswerDto;
 import com.mycompany.script.dto.StatusDto;
 import java.util.List;
-import javafx.concurrent.Task;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +23,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
     
     
+    private final TaskComponent taskComponent;
+
+    @Autowired
+    public TaskController(TaskComponent taskComponent) {
+        this.taskComponent = taskComponent;
+    }
+    
+    
+    
     /**
      * Выгрузить список задач.
      * 
@@ -26,7 +39,7 @@ public class TaskController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Task> list(){
-        return null;
+        return taskComponent.list();
     }
     
     /**
@@ -37,6 +50,7 @@ public class TaskController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public Task addTask(Task t){
+        t = taskComponent.add(t);
         return t;
     }
     
@@ -52,6 +66,20 @@ public class TaskController {
             @PathVariable("taskId") int taskId,
             @RequestBody StatusDto statusDto
     ){
-        return new AnswerDto(true, null);
+        
+        return new AnswerDto(taskComponent.setEnabled(taskId, statusDto.isStatus()), null);
+    }
+    
+    /**
+     * Запуск задачи.
+     * 
+     * @param taskId ид задачи
+     * @return ответ
+     */
+    @RequestMapping(value = "/run/{taskId}", method = RequestMethod.GET)
+    public AnswerDto runTask(
+            @PathVariable("taskId") int taskId
+    ){
+        return new AnswerDto(taskComponent.runTask(taskId), null);
     }
 }

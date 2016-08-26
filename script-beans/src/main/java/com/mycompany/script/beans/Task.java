@@ -6,6 +6,7 @@ package com.mycompany.script.beans;
  * @author nova
  */
 @lombok.Data
+@lombok.Builder
 public class Task {
     /**
      * Код задачи.
@@ -29,5 +30,10 @@ public class Task {
      * Признак включенности.
      */
     private boolean enabled;
+    
+    /**
+     * Описание задачи.
+     */
+    private String description;
     
 }

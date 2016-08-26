@@ -23,22 +23,23 @@ import org.springframework.stereotype.Component;
 
 /**
  * Основной компонент, управляющий выполнением задач.
- * 
+ *
  * @author user
  */
 @Component
 @DependsOn("dbConfig")
 public class TaskComponent {
-
+    
     private final TaskExecutor executor;
     private final TaskRepository taskRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final List<Task> taskList = new ArrayList<>();
+    private final Map<Long, Task> taskMap = new HashMap<>();
     private final Map<Long, TaskStatus> tasksStatuses = new HashMap<>();
     private final ScriptExecutor scriptExecutor;
     private final String basePath;
     private final ConfigManager configManager;
-
+    
     @Autowired
     public TaskComponent(
             TaskExecutor executor,
@@ -52,38 +53,102 @@ public class TaskComponent {
         this.basePath = basePath;
         this.configManager = configManager;
     }
-
+    
     @PostConstruct
     public void init() {
         taskList.addAll(taskRepository.list());
-        taskList.forEach(t -> {
-            TaskStatus taskStatus = new TaskStatus(t.getId());
-            tasksStatuses.put(t.getId(), taskStatus);
-            taskStatus.setNextStart(new CronSequenceGenerator(t.getScheduler()).next(new Date()));
-        });
+        taskList.forEach(this::prepareTaskStatus);
     }
-
+    
+    private void prepareTaskStatus(Task t) {
+        TaskStatus taskStatus = new TaskStatus(t.getId());
+        tasksStatuses.put(t.getId(), taskStatus);
+        taskStatus.setNextStart(new CronSequenceGenerator(t.getScheduler()).next(new Date()));
+        taskMap.put(t.getId(), t);
+    }
+    
     @Scheduled(fixedDelay = 10000l)
     public void runTasks() {
         
         for (Task t : taskList) {
-            TaskStatus taskStatus = tasksStatuses.get(t.getId());
-            logger.trace("runTasks: task={}, nextStart={}, isEnabled={}, isRunning={}, {}", 
-                    t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning(), 
-                    taskStatus.getNextStart().before(new Date()));
-            if (t.isEnabled() && !taskStatus.isRunning() && taskStatus.getNextStart().before(new Date())) {
-                logger.trace("sending task={}, nextStart={}, isEnabled={}, isRunning={}", 
+            runTask(t);
+        }
+    }
+    
+    private boolean runTask(Task t) {
+        TaskStatus taskStatus = tasksStatuses.get(t.getId());
+//        logger.trace("runTasks: task={}, nextStart={}, isEnabled={}, isRunning={}, {}",
+//                t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning(),
+//                taskStatus.getNextStart().before(new Date()));
+        if (t.isEnabled() && !taskStatus.isRunning() && taskStatus.getNextStart().before(new Date())) {
+            logger.trace("sending task={}, nextStart={}, isEnabled={}, isRunning={}",
                     t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning());
-                synchronized(taskStatus){
-                    taskStatus.setLastError(null);
-                    taskStatus.setLastFinish(null);
-                    taskStatus.setLastStart(new Date());
-                    taskStatus.setNextStart(null);
-                    taskStatus.setRunning(true);
-                }
-                executor.execute(new RunnableTask(t, taskStatus, scriptExecutor, configManager, basePath));
+            synchronized (taskStatus) {
+                taskStatus.setLastError(null);
+                taskStatus.setLastFinish(null);
+                taskStatus.setLastStart(new Date());
+                taskStatus.setNextStart(null);
+                taskStatus.setRunning(true);
+            }
+            executor.execute(new RunnableTask(t, taskStatus, scriptExecutor, configManager, basePath));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Получить список тасок.
+     * 
+     * @return список тасок
+     */
+    public List<Task> list() {
+        return taskList;
+    }
+    
+    /**
+     * Добавить таску.
+     * 
+     * @param t таска
+     * @return таска после добавления
+     */
+    public Task add(Task t) {
+        t = taskRepository.addTask(t);
+        taskList.add(t);
+        prepareTaskStatus(t);
+        return t;
+    }
+    
+    /**
+     * Включить/выключить таску.
+     * 
+     * @param taskId код таски
+     * @param status новый статус
+     * @return признак - удалось/не удалось
+     */
+    public boolean setEnabled(int taskId, boolean status) {
+        
+        Task task = taskMap.get(taskId);
+        synchronized (task) {
+            if (task.isEnabled() == status) {
+                return false;
+            } else {
+                task.setEnabled(true);
+                taskRepository.setTask(task);
+                return true;
             }
         }
     }
-
+    
+    /**
+     * Запуск таски.
+     * 
+     * @param taskId
+     * @return признак - удалось/не удалось
+     */
+    public boolean runTask(long taskId) {
+        Task task = taskMap.get(taskId);
+        return runTask(task);
+    }
+    
 }

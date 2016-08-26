@@ -8,6 +8,7 @@ package com.mycompany.script.controllers;
 
 
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ public class IndexController {
     public ModelAndView returnIndex(@RequestParam(value="name", required = false) String name){
         ModelAndView m = new ModelAndView("index");
         m.addObject("timestamp", buildProperties.getTime().getTime());
+        m.addObject("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(buildProperties.getTime()));
         m.addObject("version", buildProperties.getVersion());
         return m;
     }

@@ -41,14 +41,17 @@ public class JdbcTaskRepository implements TaskRepository{
                 + "task_path, "
                 + "task_enabled, "
                 + "task_scheduler, "
-                + "task_logger_name "
+                + "task_logger_name, "
+                + "task_description "
                 + "from tasks", (ResultSet rs, int i) -> {
-                    Task t = new Task();
-                    t.setId(rs.getLong("task_id"));
-                    t.setEnabled(rs.getBoolean("task_enabled"));
-                    t.setScheduler(rs.getString("task_scheduler"));
-                    t.setLoggerName(rs.getString("task_logger_name"));
-                    t.setPath(rs.getString("task_path"));
+                    Task t = Task.builder()
+                            .id(rs.getLong("task_id"))
+                            .enabled(rs.getBoolean("task_enabled"))
+                            .scheduler(rs.getString("task_scheduler"))
+                            .loggerName(rs.getString("task_logger_name")) 
+                            .path(rs.getString("task_path"))
+                            .description(rs.getString("task_description"))
+                            .build();
                     return t;
         });
     }
@@ -57,21 +60,21 @@ public class JdbcTaskRepository implements TaskRepository{
     @Transactional
     public Task addTask(Task t) {
         t.setId(generateId());
-        jdbcTemplate.update("insert into task(task_id, "
+        jdbcTemplate.update("insert into tasks(task_id, "
                 + "task_path, "
                 + "task_enabled, "
                 + "task_scheduler, "
-                + "task_logger_name) values(?,?,?,?,?)", 
-                t.getId(), t.getPath(), t.isEnabled(), t.getScheduler(), t.getLoggerName());
+                + "task_logger_name, task_description) values(?,?,?,?,?, ?)", 
+                t.getId(), t.getPath(), t.isEnabled(), t.getScheduler(), t.getLoggerName(), t.getDescription());
         return t;
     }
 
     @Override
     public Task setTask(Task t) {
-        int res = jdbcTemplate.update("update task set task_path=?,"
+        int res = jdbcTemplate.update("update tasks set task_path=?,"
                 + "task_enabled=?, task_enabled=?, task_scheduler = ?,"
-                + "task_logger_name=? where task_id=?",
-                t.getPath(), t.isEnabled(), t.getScheduler(), t.getLoggerName(), t.getId());
+                + "task_logger_name=?, task_description=? where task_id=?",
+                t.getPath(), t.isEnabled(), t.getScheduler(), t.getLoggerName(), t.getDescription(), t.getId());
         if(res==0) throw new EntityNotFoundException("Задача с id"+t.getId()+" не найдена в базе");
         return t;
     }
@@ -82,7 +85,7 @@ public class JdbcTaskRepository implements TaskRepository{
      * @return новый счетчик
      */
     private long generateId(){
-        Long v = jdbcTemplate.queryForObject("select max(task_id) from task", Long.class);
+        Long v = jdbcTemplate.queryForObject("select max(task_id) from tasks", Long.class);
         if(v==null){
             v = 1l;
         }
