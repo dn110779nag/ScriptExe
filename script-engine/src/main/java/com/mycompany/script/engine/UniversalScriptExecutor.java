@@ -50,7 +50,7 @@ public class UniversalScriptExecutor implements ScriptExecutor {
             
             Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
             method.setAccessible(true);
-            method.invoke(sysloader, new Object[]{new URL("file://"+absolutePath+"/")});
+            method.invoke(sysloader, new Object[]{new URL("file:///"+absolutePath+File.separator)});
             CLASSPATH.add(absolutePath);
         }
         
@@ -122,7 +122,7 @@ public class UniversalScriptExecutor implements ScriptExecutor {
 //        UniversalScriptExecutor scriptExecutor = new UniversalScriptExecutor();
 //
 //        ScriptResult res = scriptExecutor.execScript("test.groovy",
-//                "/home/data/WORK/ScriptExe/script-exe/scripts/",
+//                "E:\\Projects\\ScriptExe\\script-exe\\scripts",
 //                LoggerFactory.getLogger("test"), new HashMap<>());
 //
 //    }

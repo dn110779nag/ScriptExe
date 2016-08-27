@@ -49,7 +49,7 @@ public class TaskController {
      * @return задача после сохранения
      */
     @RequestMapping(method = RequestMethod.POST)
-    public Task addTask(Task t){
+    public Task addTask(@RequestBody Task t){
         t = taskComponent.add(t);
         return t;
     }

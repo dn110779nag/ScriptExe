@@ -7,6 +7,8 @@ package com.mycompany.script.beans;
  */
 @lombok.Data
 @lombok.Builder
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 public class Task {
     /**
      * Код задачи.
