@@ -8,9 +8,11 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
-        
+        <script src="js/sockjs.js"></script>
+        <script src="js/stomp.js"></script>
         <script src="js/ui-bootstrap-tpls-2.1.3.min.js"></script>
         <script src="js/app.js?timestamp=${timestamp?c}"></script>
+        
         </head>
     <body>
         <div><h6>Version: ${version} ${datetime}</h6></div>
@@ -33,7 +35,7 @@
                     <td>{{t.path}}</td>
                     <td>{{t.loggerName}}</td>
                     <td>{{t.scheduler}}</td>
-                    <td>{{t.enabled}}</td>
+                    <td>{{t}}</td>
                     <td>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
                         <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>

@@ -28,7 +28,7 @@ public class MainConfig {
         return executor;
     }
     
-    @Bean
+    @Bean(name = "appTaskExecutor")
     public TaskExecutor prepareTaskExecutor(){
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setMaxPoolSize(10);
