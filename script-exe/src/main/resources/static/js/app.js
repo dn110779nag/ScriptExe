@@ -2,23 +2,56 @@
 //console.log("test");
 angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 //angular.module("tasksApp", [])
-        .controller("TasksController", ['$http', '$uibModal', function ($http, $uibModal) {
+        .controller("TasksController", ['$http', '$uibModal', '$q', function ($http, $uibModal, $q) {
                 var tasks = this;
 
-                var socket = new SockJS("/statuses");
-                var stompClient = Stomp.over(socket);
+                tasks.socket = new SockJS("/statuses");
+                tasks.stompClient = Stomp.over(tasks.socket);
+                
+                function sockDataFetching(data){
+                    var deferred = $q.defer();
+                    setTimeout(function(){
+                        deferred.resolve(data);
+                    }, 1000);
+                    return deferred.promise;
+                }
+                
+                function convert2Digits(v){
+                    return (v<10?"0":"")+v;
+                    
+                };
+                
+                function formatDate(d){
+                    if(!d) return null;
+                    else{
+                        var dd = new Date(d);
+                        return moment(dd).format("YYYY-MM-DD HH:mm:ss");
+                    }
+                }
                 
                 tasks.change = function(sts){
                     var index = tasks.idIndex[""+sts.id];
-                    tasks.list[index].running = sts.running;
-                }
+                    var t = tasks.list[index];
+                    t.running = sts.running;
+                    t.enabled = sts.enabled;
+                    t.lastStart = formatDate(sts.lastStart);
+                    t.lastFinish = formatDate(sts.lastFinish);
+                    t.lastError = sts.lastError;
+                    t.nextStart = formatDate(sts.nextStart);
+                    //console.log(tasks.list[index]);
+                };
                 
-                stompClient.connect({}, function (frame) {
+                tasks.stompClient.connect({}, function (frame) {
                     console.log('!!!Connected ' + frame);
-                    stompClient.subscribe("/queue/statuses", function (message) {
+                    tasks.stompClient.subscribe("/queue/statuses", function (message) {
                         //console.log(JSON.parse(message.body));
                         var sts = JSON.parse(message.body);
-                        tasks.change(sts)
+//                        tasks.change(sts);
+                        var promise = sockDataFetching(sts);
+                        promise.then(function(data) {
+                            tasks.change(sts);
+                            //alert('Success: ' + data);
+                        });
                         //console.log("tasks.idIndex=>"+JSON.stringify(tasks.idIndex));
                         //console.log("message.body=>"+sts.id);
                         //tasks.idIndex[""+sts.id].running = sts.running;

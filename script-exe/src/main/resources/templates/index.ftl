@@ -8,6 +8,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
+        <script src="js/moment.min.js"></script>
         <script src="js/sockjs.js"></script>
         <script src="js/stomp.js"></script>
         <script src="js/ui-bootstrap-tpls-2.1.3.min.js"></script>
@@ -16,10 +17,20 @@
         </head>
     <body>
         <div><h6>Version: ${version} ${datetime}</h6></div>
-        <div ng-controller="TasksController as tasks" class="container">
-            <button class="btn btn-primary" ng-click="tasks.open()">Добавить</button>{{tasks.saved}}
+        <div ng-controller="TasksController as tasks" class="container-fluid">
+            <button class="btn btn-primary" ng-click="tasks.open()">Добавить</button>
             <h3>Задачи</h3>
+            
             <table class="table">
+                <tr>
+                    <th><input type="text" ng-model="filter.id"></th>
+                    <th><input type="text" ng-model="filter.description"></th>
+                    <th><input type="text" ng-model="filter.path"></th>
+                    <th><input type="text" ng-model="filter.loggerName"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
                 <tr>
                     <th>Идентификатор</th>
                     <th>Описание</th>
@@ -27,18 +38,26 @@
                     <th>имя логгера</th>
                     <th>расписание</th>
                     <th>Включено</th>
+                    <th>Запущено</th>
+                    <th>Следующий старт</th>
+                    <th>Дата и статус последней отработки</th>
                     <th>Действие</th>
-                    </tr>
-                <tr ng-repeat="t in tasks.list">
+                </tr>
+                <tr ng-repeat="t in tasks.list | filter:filter">
                     <td>{{t.id}}</td>
                     <td>{{t.description}}</td>
                     <td>{{t.path}}</td>
                     <td>{{t.loggerName}}</td>
                     <td>{{t.scheduler}}</td>
-                    <td>{{t}}</td>
+                    <td><input readonly type="checkbox" ng-model="t.enabled"></td>
+                    <td><input readonly type="checkbox" ng-model="t.running"><br><span title="Дата последнего старта">{{t.lastStart}}</span></td>
+                    <td>{{t.nextStart}}</td>
+                    <td>{{t.lastFinish}}<br><span title="Последняя ошибка">[{{t.lastError}}]</span></td>
                     <td>
-                        <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
-                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Копировать"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                        <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)" title="Запустить задачу немедленно. (Предварительно должно быть включено выполнение по расписанию)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Включить выполнение задачи по расписанию"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Отключить выполнение задачи по расписанию"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
                     </td>
                     </tr>
                 </table>
