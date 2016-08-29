@@ -73,7 +73,7 @@ public class TaskComponent {
         taskMap.put(t.getId(), t);
     }
 
-    @Scheduled(fixedDelay = 10000l)
+    @Scheduled(fixedDelay = 5000l)
     public void runTasks() {
 
         for (Task t : taskList) {
@@ -146,14 +146,15 @@ public class TaskComponent {
      * @param status новый статус
      * @return признак - удалось/не удалось
      */
-    public boolean setEnabled(int taskId, boolean status) {
+    public boolean setEnabled(long taskId, boolean status) {
 
         Task task = taskMap.get(taskId);
+//        logger.debug("taskMap=>{}, taskId={}, task={}", taskMap, taskId, task );
         synchronized (task) {
             if (task.isEnabled() == status) {
                 return false;
             } else {
-                task.setEnabled(true);
+                task.setEnabled(status);
                 taskRepository.setTask(task);
                 return true;
             }

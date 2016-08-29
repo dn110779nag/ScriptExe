@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="tasksApp">
     <head>
-        <title>Index</title>
+        <title>ScriptExe</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -13,10 +13,42 @@
         <script src="js/stomp.js"></script>
         <script src="js/ui-bootstrap-tpls-2.1.3.min.js"></script>
         <script src="js/app.js?timestamp=${timestamp?c}"></script>
-        
+        <style>
+            .header{
+                display: block;
+                font-size: 32px;
+            }
+            .subheader{
+                display: block;
+                font-size: 12px;
+                color: grey;
+                font-family: Courier;
+                font-weight: bold;
+            }
+            td{
+                font-size: 14px;
+                font-family: Arial;
+            }
+            .date{
+                font-size: 14px;
+                font-family: Courier;
+                font-weight: bold;
+            }
+            
+            
+        </style>
         </head>
     <body>
-        <div><h6>Version: ${version} ${datetime}</h6></div>
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><img src="images/icon128-2x.png" width="64px" height="64px" class="img-circle"></div>
+                <div class="col-md-11">
+                    <span class="header">ScriptExe - выполнение скриптов</span>
+                    <span class="subheader">Сборка: ${version} ${datetime}</span>
+                </div>
+            </div>
+        </div>
         <div ng-controller="TasksController as tasks" class="container-fluid">
             <button class="btn btn-primary" ng-click="tasks.open()">Добавить</button>
             <h3>Задачи</h3>
@@ -27,6 +59,9 @@
                     <th><input type="text" ng-model="filter.description"></th>
                     <th><input type="text" ng-model="filter.path"></th>
                     <th><input type="text" ng-model="filter.loggerName"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -49,15 +84,15 @@
                     <td>{{t.path}}</td>
                     <td>{{t.loggerName}}</td>
                     <td>{{t.scheduler}}</td>
-                    <td><input readonly type="checkbox" ng-model="t.enabled"></td>
-                    <td><input readonly type="checkbox" ng-model="t.running"><br><span title="Дата последнего старта">{{t.lastStart}}</span></td>
-                    <td>{{t.nextStart}}</td>
-                    <td>{{t.lastFinish}}<br><span title="Последняя ошибка">[{{t.lastError}}]</span></td>
+                    <td><input disabled type="checkbox" ng-model="t.enabled"></td>
+                    <td><input disabled readonly type="checkbox" ng-model="t.running"><br><span title="Дата последнего старта" class="date">{{t.lastStart}}</span></td>
+                    <td><span class="date">{{t.nextStart}}</span></td>
+                    <td><span class="date">{{t.lastFinish}}</span><br><span title="Последняя ошибка">[{{t.lastError}}]</span></td>
                     <td>
                         <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Копировать"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)" title="Запустить задачу немедленно. (Предварительно должно быть включено выполнение по расписанию)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
-                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Включить выполнение задачи по расписанию"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>
-                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Отключить выполнение задачи по расписанию"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+                        <button class="btn btn-warning btn-sm" ng-click="tasks.changeStatus(t, true)" title="Включить выполнение задачи по расписанию"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>
+                        <button class="btn btn-default btn-sm" ng-click="tasks.changeStatus(t, false)" title="Отключить выполнение задачи по расписанию"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
                     </td>
                     </tr>
                 </table>

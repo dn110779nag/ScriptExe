@@ -72,7 +72,7 @@ public class JdbcTaskRepository implements TaskRepository{
     @Override
     public Task setTask(Task t) {
         int res = jdbcTemplate.update("update tasks set task_path=?,"
-                + "task_enabled=?, task_enabled=?, task_scheduler = ?,"
+                + "task_enabled=?, task_scheduler = ?,"
                 + "task_logger_name=?, task_description=? where task_id=?",
                 t.getPath(), t.isEnabled(), t.getScheduler(), t.getLoggerName(), t.getDescription(), t.getId());
         if(res==0) throw new EntityNotFoundException("Задача с id"+t.getId()+" не найдена в базе");

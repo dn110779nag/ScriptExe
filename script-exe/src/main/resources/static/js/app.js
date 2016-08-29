@@ -7,6 +7,7 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
                 tasks.socket = new SockJS("/statuses");
                 tasks.stompClient = Stomp.over(tasks.socket);
+                tasks.stompClient.debug = function(){};
                 
                 function sockDataFetching(data){
                     var deferred = $q.defer();
@@ -16,10 +17,6 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     return deferred.promise;
                 }
                 
-                function convert2Digits(v){
-                    return (v<10?"0":"")+v;
-                    
-                };
                 
                 function formatDate(d){
                     if(!d) return null;
@@ -86,11 +83,11 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     });
                 };
 
-                tasks.changeStatus = function (item) {
+                tasks.changeStatus = function (item, newStatus) {
                     $http({
                         method: 'POST',
                         url: '/task/status/' + item.id,
-                        data: {status: item.enabled}
+                        data: {status: newStatus}
                     }).then(function (response) {
                         //Должно быть тру/фалс, но все по сокету получим
                         //tasks.status = response.data;
