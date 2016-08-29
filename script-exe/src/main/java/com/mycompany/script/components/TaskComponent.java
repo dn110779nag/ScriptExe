@@ -77,18 +77,18 @@ public class TaskComponent {
     public void runTasks() {
 
         for (Task t : taskList) {
-            runTask(t);
+            runTask(t, false);
         }
     }
 
-    private boolean runTask(Task t) {
+    private boolean runTask(Task t, boolean manual) {
         TaskStatus taskStatus = tasksStatuses.get(t.getId());
 //        logger.trace("runTasks: task={}, nextStart={}, isEnabled={}, isRunning={}, {}",
 //                t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning(),
 //                taskStatus.getNextStart().before(new Date()));
 
         try {
-            if (t.isEnabled() && !taskStatus.isRunning() && taskStatus.getNextStart().before(new Date())) {
+            if (!taskStatus.isRunning() && ((t.isEnabled() &&  taskStatus.getNextStart().before(new Date())) || manual)) {
                 logger.trace("sending task={}, nextStart={}, isEnabled={}, isRunning={}",
                         t.getId(), taskStatus.getNextStart(), t.isEnabled(), taskStatus.isRunning());
                 synchronized (taskStatus) {
@@ -169,7 +169,7 @@ public class TaskComponent {
      */
     public boolean runTask(long taskId) {
         Task task = taskMap.get(taskId);
-        return runTask(task);
+        return runTask(task, true);
     }
 
 }

@@ -29,6 +29,9 @@
                 font-size: 14px;
                 font-family: Arial;
             }
+            td.actions{
+                min-width: 160px;
+            }
             .date{
                 font-size: 14px;
                 font-family: Courier;
@@ -42,8 +45,9 @@
         
         <div class="container">
             <div class="row">
+                <div class="col-md-2"></div>
                 <div class="col-md-1"><img src="images/icon128-2x.png" width="64px" height="64px" class="img-circle"></div>
-                <div class="col-md-11">
+                <div class="col-md-9">
                     <span class="header">ScriptExe - выполнение скриптов</span>
                     <span class="subheader">Сборка: ${version} ${datetime}</span>
                 </div>
@@ -88,7 +92,7 @@
                     <td><input disabled readonly type="checkbox" ng-model="t.running"><br><span title="Дата последнего старта" class="date">{{t.lastStart}}</span></td>
                     <td><span class="date">{{t.nextStart}}</span></td>
                     <td><span class="date">{{t.lastFinish}}</span><br><span title="Последняя ошибка">[{{t.lastError}}]</span></td>
-                    <td>
+                    <td class="actions">
                         <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Копировать"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)" title="Запустить задачу немедленно. (Предварительно должно быть включено выполнение по расписанию)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.changeStatus(t, true)" title="Включить выполнение задачи по расписанию"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>
