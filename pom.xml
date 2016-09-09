@@ -10,6 +10,7 @@
         <module>script-beans</module>
         <module>script-repository</module>
         <module>script-exe</module>
+        <module>script-engine-poligon</module>
     </modules>
     <properties>
         <product.version>0.1</product.version>

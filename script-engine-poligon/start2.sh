@@ -1,0 +1,3 @@
+#java -Denv=dev -Dloader.path="/home/data/TMP/4/go-reglament/lib/*,/home/data/TMP/4/go-reglament/lib/,/home/data/TMP/4/go-reglament/lib,/home/data/TMP/4/go-reglament/lib/sample-1.0.jar,target/script-engine-poligon-0.0.1-SNAPSHOT.jar" -jar target/script-engine-poligon-0.0.1-SNAPSHOT.jar
+export CLASSPATH=/home/data/TMP/4/go-reglament/lib/sample-1.0.jar
+java -Dloader.path="/home/data/TMP/4/go-reglament/lib/" -jar target/script-engine-poligon-0.0.1-SNAPSHOT.jar

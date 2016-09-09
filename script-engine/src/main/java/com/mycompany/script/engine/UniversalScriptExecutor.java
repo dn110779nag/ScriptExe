@@ -1,5 +1,6 @@
 package com.mycompany.script.engine;
 
+import com.mycompany.script.engine.classloader.ClassLoaderHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -45,12 +46,7 @@ public class UniversalScriptExecutor implements ScriptExecutor {
         String absolutePath = new File(path).getAbsolutePath();
         System.out.println(absolutePath);
         if(!CLASSPATH.contains(absolutePath)){
-            URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Class sysclass = URLClassLoader.class;
-            
-            Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
-            method.setAccessible(true);
-            method.invoke(sysloader, new Object[]{new URL("file:///"+absolutePath+File.separator)});
+            ClassLoaderHelper.addFolder(path);
             CLASSPATH.add(absolutePath);
         }
         

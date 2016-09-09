@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+<!--    <Properties>
+        <Property name="name1">value</Property>
+        <Property name="ip">localhost</Property>
+        <Property name="port">5777</Property>
+    </Properties>-->
+    <Appenders>
+    <RollingFile name="errors" fileName="logs/errors.log"
+                 filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.errors.gz">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>%d{yy-MM-dd HH:mm:ss.SSS} %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="2"/>
+        </RollingFile>
+
+        <RollingFile name="RollingFile" fileName="logs/main.log"
+                 filePattern="logs/$${date:yyyy-MM}/main-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yy-MM-dd HH:mm:ss.SSS} %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="2"/>
+        </RollingFile>
+	
+	<RollingFile name="testFile" fileName="logs/test.log"
+                 filePattern="logs/$${date:yyyy-MM}/test-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yy-MM-dd HH:mm:ss.SSS} %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="2"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.mycompany" level="trace" additivity="false">
+            <AppenderRef ref="errors"/>
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+	<Logger name="test" level="info" additivity="false">
+            <AppenderRef ref="testFile"/>
+        </Logger>
+        <Root level="error">
+            <AppenderRef ref="errors"/>
+        </Root>
+    </Loggers>
+</Configuration>

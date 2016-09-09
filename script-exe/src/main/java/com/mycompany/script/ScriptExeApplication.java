@@ -1,5 +1,6 @@
 package com.mycompany.script;
 
+import com.mycompany.script.engine.classloader.ClassLoaderHelper;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -24,31 +25,7 @@ public class ScriptExeApplication {
         String cp = System.getProperty("custom-cp");
         LOG.info("custom-cp="+cp);
         if(cp!=null){
-            String[] paths = cp.split(":");
-            
-            URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Class sysclass = URLClassLoader.class;
-            
-            Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
-            method.setAccessible(true);
-            for(String p : paths){
-                if(p.endsWith("*")){
-                    p = p.substring(0, p.length()-1);
-                    File[] dir = new File(p).listFiles();
-                    for(File f : dir){
-                        String ap = f.getAbsolutePath();
-                        LOG.info("add "+ap);
-                        method.invoke(sysloader, new Object[]{new URL("file:///"+ap)});
-                    }
-                } else {
-                    String ap = new File(p).getAbsolutePath();
-                    LOG.info("add "+ap);
-                    method.invoke(sysloader, new Object[]{new URL("file:///"+ap+File.separator)});
-                }
-            }
-            
-            
-            
+            ClassLoaderHelper.addFoldersWithJars(cp);
         }
     }
 }
