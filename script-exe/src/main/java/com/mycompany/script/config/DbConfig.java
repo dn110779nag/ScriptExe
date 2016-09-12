@@ -5,58 +5,37 @@
  */
 package com.mycompany.script.config;
 
-import com.mycompany.script.beans.Task;
-import com.mycompany.script.repository.JdbcTaskRepository;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Конфигурация базы. если не существует.
+ * Конфигурация компонентов для работы с базой данных.
+ *
  * @author nova
  */
 @Configuration
 public class DbConfig {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     
+    
+
+    @Bean(name = "dataSource")
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource mysqlDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+    
+    @Bean
+    @Primary
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private JdbcTaskRepository jdbcTaskRepository;
-    
-    @Value("${create.script.4.tasks}")
-    private String createScript;
-    
-    @PostConstruct
-    public void init() throws SQLException{
-        boolean tableExists = false;
-        logger.trace("db-init");
-        try(Connection conn  = jdbcTemplate.getDataSource().getConnection(); 
-                ResultSet rs = conn.getMetaData().getTables(null, null, "TASKS", null);){
-            if(rs.next()){
-                tableExists = true;
-            }
-        }
-        logger.trace("tableExists={}", tableExists);
-        if(!tableExists){
-            jdbcTemplate.execute(createScript);
-            Task t = Task.builder()
-                    .id(0)
-                    .path("test.groovy")
-                    .enabled(true)
-                    .loggerName("test")
-                    .scheduler("0 *\\1 * * * *")
-                    .description("Тестовый скрипт")
-                    .build();
-            jdbcTaskRepository.addTask(t);
-        }
-        
+    public JdbcTemplate configureJdbcTempalate(@Qualifier("dataSource") DataSource dataSource){
+        return new JdbcTemplate(dataSource);
     }
 }
