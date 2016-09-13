@@ -123,7 +123,7 @@ angular.module('tasksApp').controller('ModalInstanceCtrl', function ($uibModalIn
         //save
         $http({
             method: 'POST',
-            url: '/task',
+            url: '/task?'+csrfParam+"="+csrfToken,
             data: $ctrl.item
         }).then(function (response) {
             $ctrl.item = response.data;
