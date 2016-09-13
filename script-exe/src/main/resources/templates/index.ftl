@@ -12,7 +12,12 @@
         <script src="js/sockjs.js"></script>
         <script src="js/stomp.js"></script>
         <script src="js/ui-bootstrap-tpls-2.1.3.min.js"></script>
+        <script>
+            var csrfToken = "${_csrf.token}";
+            var csrfParam = "${_csrf.parameterName}";
+        </script>
         <script src="js/app.js?timestamp=${timestamp?c}"></script>
+        
         <style>
             .header{
                 display: block;

@@ -43,15 +43,10 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     tasks.stompClient.subscribe("/queue/statuses", function (message) {
                         //console.log(JSON.parse(message.body));
                         var sts = JSON.parse(message.body);
-//                        tasks.change(sts);
                         var promise = sockDataFetching(sts);
                         promise.then(function(data) {
                             tasks.change(sts);
-                            //alert('Success: ' + data);
                         });
-                        //console.log("tasks.idIndex=>"+JSON.stringify(tasks.idIndex));
-                        //console.log("message.body=>"+sts.id);
-                        //tasks.idIndex[""+sts.id].running = sts.running;
                     });
                 }, function (error) {
                     console.log("STOMP protocol error " + error);
@@ -86,7 +81,7 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                 tasks.changeStatus = function (item, newStatus) {
                     $http({
                         method: 'POST',
-                        url: '/task/status/' + item.id,
+                        url: '/task/status/' + item.id+"?"+csrfParam+"="+csrfToken,
                         data: {status: newStatus}
                     }).then(function (response) {
                         //Должно быть тру/фалс, но все по сокету получим
@@ -138,7 +133,6 @@ angular.module('tasksApp').controller('ModalInstanceCtrl', function ($uibModalIn
     };
 
     $ctrl.cancel = function () {
-        console.log(111);
         $uibModalInstance.dismiss('cancel');
     };
 });

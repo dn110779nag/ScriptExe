@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * @author user
  */
 @Component
-@DependsOn("dbConfig")
+@DependsOn({"devDbConfig", "dbInitConfig"})
 public class TaskComponent {
 
     private final TaskExecutor executor;

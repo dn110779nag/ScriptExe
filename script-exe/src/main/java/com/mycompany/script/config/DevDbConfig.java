@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,7 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * 
  * @author nova
  */
-@Configuration
+@Configuration("devDbConfig")
 //@Profile("dev")
 public class DevDbConfig {
     
