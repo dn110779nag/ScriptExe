@@ -59,7 +59,7 @@
             </div>
         </div>
         <div ng-controller="TasksController as tasks" class="container-fluid">
-            <button class="btn btn-primary" ng-click="tasks.open()">Добавить</button>
+            <button class="btn btn-primary" ng-click="tasks.open(null,'add')" title='Добавление задачи'>Добавить</button>
             <h3>Задачи</h3>
             
             <table class="table">
@@ -98,7 +98,8 @@
                     <td><span class="date">{{t.nextStart}}</span></td>
                     <td><span class="date">{{t.lastFinish}}</span><br><span title="Последняя ошибка">[{{t.lastError}}]</span></td>
                     <td class="actions">
-                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t)" title="Копировать"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t, 'copy')" title="Копировать"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary btn-sm" ng-click="tasks.open(t, 'modification')" title="Изменить параметры задачи"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></button>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.run(t)" title="Запустить задачу немедленно. (Предварительно должно быть включено выполнение по расписанию)"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
                         <button class="btn btn-warning btn-sm" ng-click="tasks.changeStatus(t, true)" title="Включить выполнение задачи по расписанию"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></button>
                         <button class="btn btn-default btn-sm" ng-click="tasks.changeStatus(t, false)" title="Отключить выполнение задачи по расписанию"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
@@ -113,7 +114,7 @@
 
     <script type="text/ng-template" id="myModalContent.html">
         <div class="modal-header">
-            <h3 class="modal-title" id="modal-title">Добавление задачи</h3>
+            <h3 class="modal-title" id="modal-title">{{$ctrl.caption}}</h3>
         </div>
         <div class="modal-body" id="modal-body">
             <table width="100%">

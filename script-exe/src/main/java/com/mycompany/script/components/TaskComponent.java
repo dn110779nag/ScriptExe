@@ -138,6 +138,19 @@ public class TaskComponent {
         prepareTaskStatus(t);
         return t;
     }
+    
+    
+    public Task set(Task t) {
+        
+        t = taskRepository.setTask(t);
+        Task t0 = taskMap.get(t.getId());
+        t0.setDescription(t.getDescription());
+        t0.setEnabled(t.isEnabled());
+        t0.setLoggerName(t.getLoggerName());
+        t0.setPath(t.getPath());
+        t0.setScheduler(t.getScheduler());
+        return t;
+    }
 
     /**
      * Включить/выключить таску.

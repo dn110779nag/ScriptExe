@@ -7,27 +7,28 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
                 tasks.socket = new SockJS("/statuses");
                 tasks.stompClient = Stomp.over(tasks.socket);
-                tasks.stompClient.debug = function(){};
-                
-                function sockDataFetching(data){
+                tasks.stompClient.debug = function () {};
+
+                function sockDataFetching(data) {
                     var deferred = $q.defer();
-                    setTimeout(function(){
+                    setTimeout(function () {
                         deferred.resolve(data);
                     }, 1000);
                     return deferred.promise;
                 }
-                
-                
-                function formatDate(d){
-                    if(!d) return null;
-                    else{
+
+
+                function formatDate(d) {
+                    if (!d)
+                        return null;
+                    else {
                         var dd = new Date(d);
                         return moment(dd).format("YYYY-MM-DD HH:mm:ss");
                     }
                 }
-                
-                tasks.change = function(sts){
-                    var index = tasks.idIndex[""+sts.id];
+
+                tasks.change = function (sts) {
+                    var index = tasks.idIndex["" + sts.id];
                     var t = tasks.list[index];
                     t.running = sts.running;
                     t.enabled = sts.enabled;
@@ -37,14 +38,14 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     t.nextStart = formatDate(sts.nextStart);
                     //console.log(tasks.list[index]);
                 };
-                
+
                 tasks.stompClient.connect({}, function (frame) {
                     console.log('!!!Connected ' + frame);
                     tasks.stompClient.subscribe("/queue/statuses", function (message) {
                         //console.log(JSON.parse(message.body));
                         var sts = JSON.parse(message.body);
                         var promise = sockDataFetching(sts);
-                        promise.then(function(data) {
+                        promise.then(function (data) {
                             tasks.change(sts);
                         });
                     });
@@ -61,11 +62,11 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                 }).then(function (response) {
                     tasks.list = response.data;
                     tasks.idIndex = {};
-                    for(var i=0; i<tasks.list.length; i++ ){
-                        tasks.idIndex[""+tasks.list[i].id] = i;
+                    for (var i = 0; i < tasks.list.length; i++) {
+                        tasks.idIndex["" + tasks.list[i].id] = i;
                     }
-                    
-                    
+
+
                 });
 
                 tasks.run = function (item) {
@@ -81,7 +82,7 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                 tasks.changeStatus = function (item, newStatus) {
                     $http({
                         method: 'POST',
-                        url: '/task/status/' + item.id+"?"+csrfParam+"="+csrfToken,
+                        url: '/task/status/' + item.id + "?" + csrfParam + "=" + csrfToken,
                         data: {status: newStatus}
                     }).then(function (response) {
                         //Должно быть тру/фалс, но все по сокету получим
@@ -89,7 +90,7 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                     });
                 };
 
-                tasks.open = function (item) {
+                tasks.open = function (item, mode) {
                     var modalInstance = $uibModal.open({
                         animation: true,
                         ariaLabelledBy: 'modal-title',
@@ -100,13 +101,27 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                         size: 'lg',
                         resolve: {
                             item: function () {
-                                return item || {};
+                                return {
+                                    item: item || {},
+                                    mode: mode
+                                };
                             }
                         }
                     });
 
-                    modalInstance.result.then(function (selectedItem) {
-                        tasks.list.push(selectedItem);
+                    modalInstance.result.then(function (res) {
+                        var s = res.item;
+                        if(res.method=="POST"){
+                            tasks.list.push(s);
+                        } else {
+                            var index = tasks.idIndex["" + s.id];
+                            var t = tasks.list[index];
+                            s.description = t.description;
+                            s.path = t.path;
+                            s.loggerName = t.loggerName;
+                            s.enabled = t.enabled;
+                            s.scheduler = t.scheduler;
+                        }
                     }, function () {
                         console.log('Modal dismissed at: ' + new Date());
                     });
@@ -118,16 +133,24 @@ angular.module('tasksApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
 angular.module('tasksApp').controller('ModalInstanceCtrl', function ($uibModalInstance, $http, item) {
     var $ctrl = this;
-    $ctrl.item = item;
+    $ctrl.item = item.item;
+    $ctrl.mode = item.mode;
+    $ctrl.caption = {
+        "add":"Добавление задачи", 
+        "copy":"Копирование задачи", 
+        "modification": "Изменение задачи"
+    }[$ctrl.mode];
+    $ctrl.method = $ctrl.mode==="modification"?"PUT":"POST";
+    
     $ctrl.ok = function () {
         //save
         $http({
-            method: 'POST',
-            url: '/task?'+csrfParam+"="+csrfToken,
+            method: $ctrl.method,
+            url: '/task?' + csrfParam + "=" + csrfToken,
             data: $ctrl.item
         }).then(function (response) {
             $ctrl.item = response.data;
-            $uibModalInstance.close($ctrl.item);
+            $uibModalInstance.close({item: $ctrl.item, method: $ctrl.method});
         });
 
     };

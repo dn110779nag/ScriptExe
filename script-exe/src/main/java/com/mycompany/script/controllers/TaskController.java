@@ -54,6 +54,12 @@ public class TaskController {
         return t;
     }
     
+    @RequestMapping(method = RequestMethod.PUT)
+    public Task setTask(@RequestBody Task t){
+        t = taskComponent.set(t);
+        return t;
+    }
+    
     /**
      * Приостановаить/Включить задачу.
      * 
