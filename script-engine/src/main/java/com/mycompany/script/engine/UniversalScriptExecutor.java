@@ -88,7 +88,7 @@ public class UniversalScriptExecutor implements ScriptExecutor {
         ScriptResult result = new ScriptResult();
 
         try {
-            addPath(basePath);
+//            addPath(basePath);
             String extension = getExtension(scriptPath);
             ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
             if (engine == null) {

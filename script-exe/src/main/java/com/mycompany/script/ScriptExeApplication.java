@@ -16,7 +16,7 @@ public class ScriptExeApplication {
     private static final Logger LOG = LoggerFactory.getLogger(ScriptExeApplication.class);
 
     public static void main(String[] args) throws Exception {
-        addClassPath();
+//        addClassPath();
         SpringApplication.run(ScriptExeApplication.class, args);
     }
     
