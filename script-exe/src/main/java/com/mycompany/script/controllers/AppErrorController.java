@@ -7,13 +7,11 @@ package com.mycompany.script.controllers;
 
 import com.mycompany.script.dto.AnswerDto;
 import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.boot.autoconfigure.web.BasicErrorController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.ErrorController;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("${server.error.path:${error.path:/error}}")
 public class AppErrorController implements ErrorController{
     private static final String ERROR_PATH = "/error";
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public String getErrorPath() {
