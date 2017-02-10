@@ -1,6 +1,7 @@
 package com.mycompany.script.engine;
 
 import com.mycompany.script.engine.classloader.ClassLoaderHelper;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -15,6 +16,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -31,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class UniversalScriptExecutor implements ScriptExecutor {
 
     private static final Set<String> CLASSPATH = new HashSet<>();
+    
+    Map<String, ScriptInfo> map = new HashMap<>();
 
     /**
      * Добавление корневой папки со скриптами в класспас, чтобы работыли либы.
@@ -68,6 +73,18 @@ public class UniversalScriptExecutor implements ScriptExecutor {
             throw new IndexOutOfBoundsException("Невозможно определить расширение файла " + fileName);
         }
     }
+    
+    private String readScript(String basePath, String scriptPath) throws IOException{
+        StringBuilder b = new StringBuilder();
+        try (BufferedReader reader = Files.newBufferedReader(new File(basePath, scriptPath).toPath())) {
+                
+                String line;
+                while((line = reader.readLine())!=null){
+                    b.append(line).append('\n');
+                }
+        }
+        return b.toString();
+    }
 
     /**
      * Запуск скрипта.
@@ -91,6 +108,7 @@ public class UniversalScriptExecutor implements ScriptExecutor {
 //            addPath(basePath);
             String extension = getExtension(scriptPath);
             ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
+            
             if (engine == null) {
                 throw new IOException("Движок не найден для расширения " + extension);
             }
@@ -100,8 +118,22 @@ public class UniversalScriptExecutor implements ScriptExecutor {
             engineScope.putAll(binding);
             engineScope.put("logger", logger);
             result.setStart(System.currentTimeMillis());
-            try (Reader reader = Files.newBufferedReader(new File(basePath, scriptPath).toPath())) {
-                Object value = engine.eval(reader, engineScope);
+            if(engine instanceof Compilable){
+                File f = new File(basePath, scriptPath); 
+                ScriptInfo info = map.get(f.getAbsolutePath());
+                
+                if(info==null || f.lastModified()>info.getTlm()){
+                    Compilable compEngine = (Compilable) engine;
+                    CompiledScript compiledScript = compEngine.compile(readScript(basePath, scriptPath));
+                    info = new ScriptInfo(f.lastModified(), compiledScript);
+                    map.put(f.getAbsolutePath(), info);
+                    
+                }
+                info.getCompiled().eval(engineScope);
+                
+            } else {
+            
+                Object value = engine.eval(readScript(basePath, scriptPath), engineScope);
                 result.setResult(value);
             }
         } catch (Throwable ex) {
