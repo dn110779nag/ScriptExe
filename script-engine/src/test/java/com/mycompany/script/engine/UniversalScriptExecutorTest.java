@@ -5,6 +5,7 @@
  */
 package com.mycompany.script.engine;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -49,7 +50,7 @@ public class UniversalScriptExecutorTest {
     public void testExecScript() {
         System.out.println("execScript");
         String scriptPath = "SimpleGroovyScript.groovy";
-        String basePath = "src\\test\\groovy\\";
+        String basePath = "src\\test\\groovy\\".replaceAll("\\\\", File.separator);
         Logger logger = LoggerFactory.getLogger(UniversalScriptExecutorTest.class);
         Map<String, Object> binding = new HashMap<>();
         UniversalScriptExecutor instance = new UniversalScriptExecutor();
