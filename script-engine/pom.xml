@@ -6,6 +6,7 @@
         <artifactId>ScriptExe</artifactId>
         <version>1.0</version>
     </parent>
+    <version>1.0.1</version>
     <artifactId>script-engine</artifactId>
     <packaging>jar</packaging>
     <dependencies>

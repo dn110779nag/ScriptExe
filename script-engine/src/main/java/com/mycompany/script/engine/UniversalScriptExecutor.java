@@ -129,8 +129,8 @@ public class UniversalScriptExecutor implements ScriptExecutor {
                     map.put(f.getAbsolutePath(), info);
                     
                 }
-                info.getCompiled().eval(engineScope);
-                
+                Object value = info.getCompiled().eval(engineScope);
+                result.setResult(value);
             } else {
             
                 Object value = engine.eval(readScript(basePath, scriptPath), engineScope);
