@@ -28,7 +28,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 
         @Bean(name = "securityDataSource")
         @ConfigurationProperties(prefix = "security.datasource")
-        public DataSource mysqlDataSource() {
+        public DataSource configureDataSource() {
             return DataSourceBuilder.create().build();
         }
 
